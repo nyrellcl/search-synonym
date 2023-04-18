@@ -1,33 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React, { useState } from 'react'
+import WordFacade from "./api/api"
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [word, setWord] = useState<string>("")
+  const [synonym, setSynonym] = useState<string[]>([])
+
+  const handleSearch = async (word: string) =>{
+    const data = await WordFacade.getSynonymData(word);
+    setSynonym(data)
+  }
+
+  const handleFetchSynonym = (e: React.FormEvent) =>{
+    e.preventDefault()
+    handleSearch(word)
+
+  }
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <form onSubmit={handleFetchSynonym}>
+        <label htmlFor='word-input'>Your Word</label>
+        <input
+        value={word}
+        onChange={(e) => setWord(e.target.value)}
+        id="word-input"
+        name='word-input'
+        ></input>
+        <button type='submit'>Submit</button>
+      </form>
     </div>
   )
 }
