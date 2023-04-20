@@ -1,53 +1,52 @@
-import React, { useState } from 'react'
-import WordFacade from "./api/api"
-import './App.css'
+import React, { useState } from "react";
 
-interface Synonym {
-  word: string,
-  score: number
-}
+import { SynonymFinder } from "./api/api";
+import "./App.css";
 
 function App() {
-  const [word, setWord] = useState<string>("")
-  const [synonym, setSynonym] = useState<Synonym[]>([])
+  const [searchWord, setSearchWord] = useState<string>("");
+  const [synonym, setSynonym] = useState<string[]>([]);
 
-  const handleSearch = async (word: string) =>{
-    const data = await WordFacade.getSynonymData(word);
-    setSynonym(data)
+  const handleSearch = async (word: string) => {
+    const finder = new SynonymFinder();
+    const synonymResults = await finder.findSynonyms(word);
+    setSynonym(synonymResults);
+  };
+
+  const handleFetchSynonym = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch(searchWord);
   }
 
-  const handleFetchSynonym = (e: React.FormEvent) =>{
-    e.preventDefault()
-    handleSearch(word)
-
-  }
-
-  const handleNewWordClicked = async (newWord: string) =>{
-    const newWordData = await WordFacade.getSynonymData(newWord)
-    setSynonym(newWordData)
-    setWord(newWord)
-  }
+  const handleNewWordClicked = async (newWord: string) => {
+    const newWordFinder = new SynonymFinder();
+    const newWordData = await newWordFinder.findSynonyms(newWord);
+    setSynonym(newWordData);
+    setSearchWord(newWord);
+  };
 
   return (
     <div className="App">
       <form onSubmit={handleFetchSynonym}>
-        <label htmlFor='word-input'>Your Word</label>
+        <label htmlFor="word-input">Your Word</label>
         <input
-        value={word}
-        onChange={(e) => setWord(e.target.value)}
-        id="word-input"
-        name='word-input'
+          value={searchWord}
+          onChange={(e) => setSearchWord(e.target.value)}
+          id="word-input"
+          name="word-input"
         ></input>
-        <button type='submit'>Submit</button>
+        <button type="submit">Submit</button>
 
         <ul>
-        {synonym.map((synonyms, idx)=>(
-          <li key={idx} onClick={()=>handleNewWordClicked(synonyms.word)}>{synonyms.word}</li>
-        ))}
+          {synonym.map((synonyms, idx) => (
+            <li key={idx} onClick={() => handleNewWordClicked(synonyms)}>
+              {synonyms}
+            </li>
+          ))}
         </ul>
       </form>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
