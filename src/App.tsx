@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { SynonymFinder, SynonymFinderFacade } from "./api/api";
+import { SynonymGetter, SynonymFinderFacade } from "./api/api";
 import "./App.css";
 
 function App() {
@@ -8,9 +8,9 @@ function App() {
   const [synonym, setSynonym] = useState<string[]>([]);
 
   const handleSearch = async (word: string) => {
-    const synonymFinder = new SynonymFinder();
-    const synonymFacade = new SynonymFinderFacade(synonymFinder)
-    const synonymResults = await synonymFacade.findSynonyms(word);
+    const getSynonym = new SynonymGetter();
+    const synonymFacade = new SynonymFinderFacade(getSynonym)
+    const synonymResults = await synonymFacade.getSynonyms(word);
     setSynonym(synonymResults);
   };
 
@@ -20,9 +20,9 @@ function App() {
   }
 
   const handleNewWordClicked = async (newWord: string) => {
-    const newSynonymFinder = new SynonymFinder();
-    const newSynonymFinderFacade = new SynonymFinderFacade(newSynonymFinder)
-    const newWordData = await newSynonymFinderFacade.findSynonyms(newWord);
+    const getNewSynonym = new SynonymGetter();
+    const getNewSynonymFacade = new SynonymFinderFacade(getNewSynonym)
+    const newWordData = await getNewSynonymFacade.getSynonyms(newWord);
     setSynonym(newWordData);
     setSearchWord(newWord);
   };
