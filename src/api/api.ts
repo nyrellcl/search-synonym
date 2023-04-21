@@ -4,37 +4,34 @@ interface Synonyms {
   getSynonyms(searchTerm: string): Promise<string[]>;
 }
 
-export class SynonymGetter implements Synonyms {
-    private readonly BASE_API_URL: string;
-  
-    constructor() {
-      this.BASE_API_URL = "https://api.datamuse.com/words";
+async function fetchAPI(param: string): Promise<string[]> {
+  try {
+    const res = await fetch(param);
+    const synonyms = await res.json();
+    if (res.status != 200) {
+      throw new Error(`Server responded with ${res.status} status`);
     }
-    public async getSynonyms(searchTerm: string): Promise<string[]> {
-      const queryParam = "rel_syn";
-      const url = `${this.BASE_API_URL}?${queryParam}=${searchTerm}`;
-  
-      try {
-        const res = await fetch(url);
-        if (res.status >= 200 && res.status < 300) {
-          const synonyms = await res.json();
-          return synonyms.map((s: { word: string }) => s.word);
-        } else {
-          throw new Error(`Server responded with ${res.status} status`);
-        }
-      } catch (error) {
-        console.error("Error while fetching synonyms: ", error);
-        return ["No synonyms found"];
-      }
-    }
+    return synonyms.map((s: { word: string }) => s.word);
+  } catch (error) {
+    console.error("Error while fetching synonyms: ", error);
+    return ["No synonyms found"];
   }
+}
 
+export class SynonymGetter implements Synonyms {
+  private readonly BASE_API_URL: string;
 
+  constructor() {
+    this.BASE_API_URL = "https://api.datamuse.com/words";
+  }
+  public async getSynonyms(searchTerm: string): Promise<string[]> {
+    const queryParam = "rel_syn";
+    const url = `${this.BASE_API_URL}?${queryParam}=${searchTerm}`;
+    return fetchAPI(url);
+  }
+}
 
-
-
-
-export class SynonymFinderFacade implements Synonyms {
+export class SynonymGetterFacade implements Synonyms {
   private readonly synonym: Synonyms;
 
   constructor(synonym: Synonyms) {
@@ -46,11 +43,6 @@ export class SynonymFinderFacade implements Synonyms {
   }
 }
 
-
-
-
-
-
 /*export class SynonymGetter implements Synonyms {
     private readonly BASE_API_URL: string;
   
@@ -60,18 +52,6 @@ export class SynonymFinderFacade implements Synonyms {
     public async getSynonyms(searchTerm: string): Promise<string[]> {
       const queryParam = "rel_syn";
       const url = `${this.BASE_API_URL}?${queryParam}=${searchTerm}`;
-  
-      try {
-        const res = await axios.get(url);
-        if (res.status >= 200 && res.status < 300) {
-          const synonyms = await res.data;
-          return synonyms.map((s: { word: string }) => s.word);
-        } else {
-          throw new Error(`Server responded with ${res.status} status`);
-        }
-      } catch (error) {
-        console.error("Error while fetching synonyms: ", error);
-        return ["No synonyms found"];
-      }
+      return fetchAPI(url)
     }
   }*/
