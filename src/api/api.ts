@@ -1,5 +1,3 @@
-import axios from "axios";
-
 interface Synonyms {
   getSynonyms(searchTerm: string): Promise<string[]>;
 }
@@ -25,8 +23,9 @@ export class SynonymGetter implements Synonyms {
     this.BASE_API_URL = "https://api.datamuse.com/words";
   }
   public async getSynonyms(searchTerm: string): Promise<string[]> {
-    const queryParam = "rel_syn";
-    const url = `${this.BASE_API_URL}?${queryParam}=${searchTerm}`;
+    const params = new URLSearchParams();
+    params.append("rel_syn", searchTerm);
+    const url = `${this.BASE_API_URL}?${params.toString()}`;
     return fetchAPI(url);
   }
 }
@@ -42,16 +41,3 @@ export class SynonymGetterFacade implements Synonyms {
     return this.synonym.getSynonyms(searchTerm);
   }
 }
-
-/*export class SynonymGetter implements Synonyms {
-    private readonly BASE_API_URL: string;
-  
-    constructor() {
-      this.BASE_API_URL = "https://api.datamuse.com/words";
-    }
-    public async getSynonyms(searchTerm: string): Promise<string[]> {
-      const queryParam = "rel_syn";
-      const url = `${this.BASE_API_URL}?${queryParam}=${searchTerm}`;
-      return fetchAPI(url)
-    }
-  }*/
